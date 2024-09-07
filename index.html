@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bitstats</title>
+  <style>
+    body {
+      font-family: 'Trebuchet MS', sans-serif;
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+    }
+
+    #widget-container {
+      display: flex;
+      flex-wrap: wrap;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px; 
+    }
+
+    .widget {
+      background-color: #fff;
+      padding: -1px; 
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 350px; 
+      height: 130px; 
+      overflow: hidden;
+      position: relative; 
+      top: -5px; 
+    }
+
+    #widget-container .widget:nth-child(16) {
+      width: 360px; 
+      height: 150px; 
+      top: -5px; 
+    }
+
+    .widget::before {
+      content: '';
+      position: absolute;
+      top: 10px; 
+      right: 10px; 
+      width: 40px;  
+      height: 40px; 
+      background-color: #fff; 
+      z-index: 2;
+      border-radius: 5px; 
+    }
+
+    .bitcoin-address {
+      display: inline-flex;
+      align-items: center;
+      font-size: 1.1em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .copy-icon {
+      cursor: pointer;
+      user-select: none;
+      margin-left: 0px;
+      font-size: 1.2em; 
+    }
+
+    #note {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    #bitcoin-address {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .bitcoin-icon {
+      width: 40px;  
+      height: 40px; 
+      vertical-align: middle; 
+    }
+
+    #status-message {
+      color: green;
+      font-weight: bold;
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>bitstats.net</h1>
+  <h2>Real-Time Bitcoin Prices in Multiple Currencies</h2>
+
+  <div style="text-align: center; margin: 0px 0 30px 0;">
+  <a href="https://go.nordvpn.net/SH4x4" target="_blank">
+    <img src="data:image/png;base64,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" alt="NordVPN Advert Banner" style="max-width: 100%; height: auto;">
+  </a>
+</div>
+
+  <!-- Bitcoin Address Section -->
+  <div id="bitcoin-address">
+    Support bitstats - Bitcoin Address:
+    <br>
+    <img src="data:image/png;base64,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" alt="Bitcoin Icon" class="bitcoin-icon">
+    <span id="btc-address-text">1D3N7ffRmY8YY5wDtpyY85T8fgo66JJn7D</span>
+    <span class="copy-icon" onclick="copyBitcoinAddress()">⎘</span>
+  </div>
+
+  <!-- Status message for copy confirmation -->
+  <div id="status-message">Bitcoin Address Copied!</div>
+
+  <div id="widget-container">
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="usd"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="eur"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="gbp"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="chf"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="cad"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="aud"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="nzd"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="jpy"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="krw"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="cny"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="hkd"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="sgd"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="thb"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="zar"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="aed"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="sats"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="bnb"></gecko-coin-ticker-widget>
+    </div>
+    <div class="widget">
+      <gecko-coin-ticker-widget locale="en" outlined="true" initial-currency="eth"></gecko-coin-ticker-widget>
+    </div>
+  </div>
+
+  <div id="note">Copyright bitstats.crypto 2024 - All prices are dynamically updated by Coingecko</div>
+
+  <script src="https://widgets.coingecko.com/gecko-coin-ticker-widget.js"></script>
+  
+  <script>
+    function reloadWidgets() {
+      document.querySelectorAll('gecko-coin-ticker-widget').forEach(widget => {
+        const parent = widget.parentNode;
+        const clone = widget.cloneNode(true);
+        parent.replaceChild(clone, widget);
+      });
+    }
+
+    reloadWidgets();
+    setInterval(reloadWidgets, 60000);
+
+    // Copy Bitcoin address function
+    function copyBitcoinAddress() {
+      const bitcoinAddress = document.getElementById('btc-address-text').textContent;
+
+      navigator.clipboard.writeText(bitcoinAddress).then(() => {
+        // Show confirmation message
+        const statusMessage = document.getElementById('status-message');
+        statusMessage.style.display = 'block';
+        
+        // Hide confirmation message after 2 seconds
+        setTimeout(() => {
+          statusMessage.style.display = 'none';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    }
+  </script>
+</body>
+</html>
